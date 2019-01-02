@@ -5,18 +5,18 @@ import lombok.extern.java.Log;
 import nannybot.model.Boop;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
+import javax.inject.Singleton;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-@Log
+@Log @Singleton
 public class BoopInfoMessageProcessor extends MessageProcessor {
 
 	private static final Pattern bmrx = Pattern.compile("^\\s*!boopinfo\\s+(@)?(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
 
 	public BoopInfoMessageProcessor() {
-		super();
 		rx = bmrx;
 	}
 
@@ -34,9 +34,9 @@ public class BoopInfoMessageProcessor extends MessageProcessor {
 				List<Boop> boops = Main.m.getDb().getBoopsByName(handle);
 				StringBuilder sb = new StringBuilder();
 				for(Boop b : boops) {
-					sb.append(b.toString()).append("\n");
+					sb.append(b.toString()).append(",\n");
 				}
-				mre.getTextChannel().sendMessage("Boops for @" + handle + ": " + sb.toString());
+				mre.getTextChannel().sendMessage("Boops for @" + handle + ": \n" + sb.toString()).queue();
 			}
 			catch(Exception e) {
 				log.log(Level.SEVERE, "An exception was thrown", e);

@@ -11,7 +11,13 @@ import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Log
+@Log @Singleton
 public class Main extends ListenerAdapter {
 	@Getter
 	private final Config c;
@@ -31,24 +37,34 @@ public class Main extends ListenerAdapter {
 	@Getter
 	private final JDA jda;
 	@Getter
-	private final DB db;
+	private DB db;
 	public static Main m;
 	private final ExecutorService pool;
-	public static final List<MessageProcessor> parsers = new CopyOnWriteArrayList<MessageProcessor>();
+	@Inject @Any
+	public Instance<MessageProcessor> parsers;
+	private static String[] args;
 	
-	public Main(String[] args) throws Exception {
+	public Main() throws Exception {
 		cli = getCommandLineOptions(args);
 		c = getConfig();
+		if(c.getDbDir().startsWith("~")) {
+			c.setDbDir(c.getDbDir().replace("~", System.getProperty("user.home")));
+			log.info("Replaced dbDir ~; now dbDir is " + c.getDbDir());
+		}
 		pool = Executors.newWorkStealingPool();
 		jda = new JDABuilder(c.getDiscordSecret()).addEventListener(this).build();
 		if(c == null) {
 			throw new RuntimeException("No config found.");
 		}
-		db = new DB();
+		log.info(String.format("Config parsed: %s", c.toString()));
 	}
 	
 	public static void main(String[] args) throws Exception {
-		m = new Main(args);
+		Main.args = args;
+		Weld weld = new Weld();
+		WeldContainer container = weld.initialize();
+		m = container.instance().select(Main.class).get();
+		m.db = new DB();
 		m.getJda().awaitReady();
 	}
 	
@@ -91,20 +107,29 @@ public class Main extends ListenerAdapter {
         	String gn = event.getGuild().getName();
         	String cn = event.getChannel().getName();
         	User user = event.getAuthor();
+        	if(user.isBot()) {
+        		return;
+			}
         	String message = event.getMessage().getContentDisplay();
         	if(cn.startsWith("#")) {
         		cn = cn.replaceFirst("#", "");
         	}
         	
         	if((c.serverWhitelist.size() == 0 || c.serverWhitelist.contains(gn)) && (c.channelWhitelist.size() == 0 || c.channelWhitelist.contains(cn))) {
+        		log.info("Running on " + formatMre(event));
         		pool.execute(() -> parseMessage(event));
         	}
+        	else {
+        		log.info("NOT running on " + formatMre(event));
+			}
         }
     }
 	
 	private void parseMessage(MessageReceivedEvent event) {
 		for(var i : parsers) {
+			log.info(String.format("Running %s", i.getClass().getSimpleName()));
 			MessageProcessor.Response r = i.processMessage(event);
+			log.info(String.format("Tried %s on %s: Result {{Matched: %b, Error: %b, Stop: %b}}", i.getClass().getSimpleName(), formatMre(event), r.isMatched(), r.isError(), r.isStop()));
 			if(r.isMatched() && r.isError()) {
 				log.severe("Error parsing message!");
 			}
@@ -112,6 +137,11 @@ public class Main extends ListenerAdapter {
 				return;
 			}
 		}
+	}
+
+	public static String formatMre(MessageReceivedEvent mre) {
+		return String.format("Message Received: gn('%s'), cn('%s'), user('%s'), message('%s')", mre.getGuild().getName(),
+				mre.getChannel().getName(), mre.getAuthor().getName(), mre.getMessage().getContentDisplay());
 	}
 
 }

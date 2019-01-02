@@ -1,13 +1,11 @@
 package nannybot;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import lombok.extern.java.Log;
 
 import java.util.List;
 
-@Data @Builder @Log
+@Data @Builder @Log @NoArgsConstructor @AllArgsConstructor
 public class Config {
 	@NonNull
 	String discordSecret;

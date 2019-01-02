@@ -11,11 +11,7 @@ import java.util.regex.Pattern;
 public abstract class MessageProcessor {
 
 	@Getter
-	protected Pattern rx; 
-	
-	protected MessageProcessor() {
-		Main.parsers.add(this);
-	}
+	protected Pattern rx;
 	
 	protected final Matcher matches(MessageReceivedEvent mre) {
 		var t = rx.matcher(mre.getMessage().getContentDisplay());

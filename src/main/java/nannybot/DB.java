@@ -29,7 +29,7 @@ public class DB {
     }
 
     public List<Boop> getBoopsByName(String handle) {
-        return templ.find(String.format("/.[when='%s']", handle), Boop.class);
+        return templ.find(String.format("/.[who='%s']", handle), Boop.class);
     }
 
 
