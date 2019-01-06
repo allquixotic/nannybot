@@ -2,6 +2,7 @@ package nannybot;
 
 import lombok.*;
 import lombok.extern.java.Log;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.regex.Matcher;
@@ -26,5 +27,9 @@ public abstract class MessageProcessor {
 		boolean error;
 		boolean stop;
 		MessageReceivedEvent mre;
+	}
+
+	public final void messageAwooPing(MessageReceivedEvent mre, String message) {
+		mre.getTextChannel().sendMessage(new MessageBuilder().append(mre.getAuthor()).append(" ").append(message).build()).queue();
 	}
 }

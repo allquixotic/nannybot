@@ -36,7 +36,7 @@ public class BoopInfoMessageProcessor extends MessageProcessor {
 				for(Boop b : boops) {
 					sb.append(b.toString()).append(",\n");
 				}
-				mre.getTextChannel().sendMessage("Boops for @" + handle + ": \n" + sb.toString()).queue();
+				messageAwooPing(mre, "Boops for @" + handle + ": \n" + sb.toString());
 			}
 			catch(Exception e) {
 				log.log(Level.SEVERE, "An exception was thrown", e);

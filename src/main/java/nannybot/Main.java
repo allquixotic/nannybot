@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,20 +44,27 @@ public class Main extends ListenerAdapter {
 	@Inject @Any
 	public Instance<MessageProcessor> parsers;
 	private static String[] args;
+	public static final SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yy hh:mm:ss a z");
 	
 	public Main() throws Exception {
 		cli = getCommandLineOptions(args);
 		c = getConfig();
-		if(c.getDbDir().startsWith("~")) {
-			c.setDbDir(c.getDbDir().replace("~", System.getProperty("user.home")));
-			log.info("Replaced dbDir ~; now dbDir is " + c.getDbDir());
-		}
+		c.setDbDir(unSquiggle(c.getDbDir()));
+		c.setGoogleCredentialsFilePath(unSquiggle(c.getGoogleCredentialsFilePath()));
+		c.setGoogleTokensDirectoryPath(unSquiggle(c.getGoogleTokensDirectoryPath()));
 		pool = Executors.newWorkStealingPool();
 		jda = new JDABuilder(c.getDiscordSecret()).addEventListener(this).build();
 		if(c == null) {
 			throw new RuntimeException("No config found.");
 		}
 		log.info(String.format("Config parsed: %s", c.toString()));
+	}
+
+	private static String unSquiggle(String input) {
+		if(input.startsWith("~")) {
+			return input.replaceFirst("~", System.getProperty("user.home"));
+		}
+		return input;
 	}
 	
 	public static void main(String[] args) throws Exception {

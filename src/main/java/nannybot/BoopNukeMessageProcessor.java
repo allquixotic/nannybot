@@ -3,21 +3,23 @@ package nannybot;
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 import nannybot.model.Boop;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 @Log @Singleton
-public class BoopsMessageProcessor extends MessageProcessor {
+public class BoopNukeMessageProcessor extends MessageProcessor {
 
-	private static final Pattern bmrx = Pattern.compile("^\\s*!boops\\s*(\\d+)?\\s*$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern bmrx = Pattern.compile("^\\s*!boopnuke\\s+(@)?(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
 
-	public BoopsMessageProcessor() {
+	@Inject
+	private Sheet sheet;
+
+	public BoopNukeMessageProcessor() {
 		rx = bmrx;
 	}
 
@@ -31,14 +33,9 @@ public class BoopsMessageProcessor extends MessageProcessor {
 			retval.error(false);
 
 			try {
-				String sNumDays = matcher.group(1);
-				int numDays = Strings.isNullOrEmpty(sNumDays) ? 7 : Integer.parseInt(sNumDays);
-				List<Boop> boops = Main.m.getDb().getBoopsWithinDays(numDays);
-				StringBuilder sb = new StringBuilder();
-				for(Boop b : boops) {
-					sb.append(b.toString()).append(",\n");
-				}
-				messageAwooPing(mre, "Boops within the past " + numDays + " days: \n" + sb.toString());
+				String handle = matcher.group(2);
+				Main.m.getDb().nuke(handle);
+				messageAwooPing(mre, "Nuked boops for: " + handle);
 			}
 			catch(Exception e) {
 				log.log(Level.SEVERE, "An exception was thrown", e);

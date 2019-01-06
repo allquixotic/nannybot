@@ -13,9 +13,11 @@ public class Config {
 	List<String> channelWhitelist;
 	@NonNull
 	String dbDir;
-	
-	String googleToken;
-	String googleSecret;
-	String docId;
-	String sheetName;
+
+	String googleApplicationName;
+	String googleTokensDirectoryPath;
+	String googleCredentialsFilePath;
+	String sheetId;
+	String sheetRange;
+	String boophelp;
 }

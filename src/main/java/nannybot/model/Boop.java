@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nannybot.Main;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,6 +23,6 @@ public class Boop implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("On %s, %s booped @%s; details: %s", when, by, who, detail);
+        return String.format("On %s, %s booped @%s; details: %s", Main.fmt.format(when), by, who, detail);
     }
 }

@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DB {
     private final JsonDBTemplate templ;
@@ -31,8 +32,15 @@ public class DB {
         templ.insert(b);
     }
 
+    public void nuke(String handle) {
+        List<Boop> ugh = templ.find(String.format("/.", handle), Boop.class);
+        List<Boop> toRemove = ugh.parallelStream().filter(beep -> handle.equalsIgnoreCase(beep.getWho())).collect(Collectors.toList());
+        toRemove.forEach(beep -> templ.remove(beep, Boop.class));
+    }
+
     public List<Boop> getBoopsByName(String handle) {
-        return templ.find(String.format("/.[who='%s']", handle), Boop.class);
+        List<Boop> ugh = templ.find(String.format("/.", handle), Boop.class);
+        return ugh.parallelStream().filter(beep -> handle.equalsIgnoreCase(beep.getWho())).collect(Collectors.toList());
     }
 
     public List<Boop> getBoopsWithinDays(int days) {
