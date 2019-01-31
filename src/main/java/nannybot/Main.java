@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +46,10 @@ public class Main extends ListenerAdapter {
 	public Instance<MessageProcessor> parsers;
 	private static String[] args;
 	public static final SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yy hh:mm:ss a z");
+
+	static {
+		fmt.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+	}
 	
 	public Main() throws Exception {
 		cli = getCommandLineOptions(args);
