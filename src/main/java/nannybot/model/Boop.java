@@ -25,4 +25,8 @@ public class Boop implements Serializable {
     public String toString() {
         return String.format("On %s, %s booped @%s; details: %s", Main.fmt.format(when), by, who, detail);
     }
+
+    public String toStringWithoutDetail() {
+        return String.format("On %s, %s booped @%s", Main.fmt.format(when), by, who);
+    }
 }

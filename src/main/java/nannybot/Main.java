@@ -133,7 +133,7 @@ public class Main extends ListenerAdapter {
         		pool.execute(() -> parseMessage(event));
         	}
         	else {
-        		log.info("NOT running on " + formatMre(event));
+        		//log.info("NOT running on " + formatMre(event));
 			}
         }
     }

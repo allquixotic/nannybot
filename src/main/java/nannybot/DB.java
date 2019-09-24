@@ -1,15 +1,21 @@
 package nannybot;
 
 import io.jsondb.JsonDBTemplate;
+import lombok.extern.java.Log;
 import nannybot.model.Boop;
 
 import java.io.File;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+@Log
 public class DB {
     private final JsonDBTemplate templ;
 
@@ -49,9 +55,12 @@ public class DB {
         }
         List<Boop> orig = templ.getCollection(Boop.class);
         List<Boop> retval = new ArrayList<>();
+        final LocalDate rightnow = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        //log.log(Level.INFO, "Right now: " + rightnow.toString());
         for(Boop b : orig) {
-            long delta = Math.abs(ChronoUnit.DAYS.between(b.getWhen().toInstant(), new Date().toInstant()));
-            if(delta >= 0L && delta <= 7L) {
+            long delta = Math.abs(ChronoUnit.DAYS.between(b.getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), rightnow));
+            //log.log(Level.INFO, "For " + b.getWhen().toString() + ", Delta: " + delta);
+            if(delta >= 0L && delta <= (long) days) {
                 retval.add(b);
             }
         }

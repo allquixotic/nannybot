@@ -1,12 +1,17 @@
 package nannybot;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+
 import lombok.extern.java.Log;
 import nannybot.model.Boop;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,7 +43,25 @@ public class BoopsMessageProcessor extends MessageProcessor {
 				for(Boop b : boops) {
 					sb.append(b.toString()).append(",\n");
 				}
-				messageAwooPing(mre, "Boops within the past " + numDays + " days: \n" + sb.toString());
+				String k = "Boops within the past " + numDays + " days: \n";
+				int maxl = 1900 - k.length();
+				Iterable<String> result = Splitter.fixedLength(maxl).split(sb);
+				String[] parts = Iterables.toArray(result, String.class);
+				int i = 0;
+				for(String vring : parts) {
+					if(i >= 7) {
+						messageAwooPing(mre, "OK, that's enough. I'm not going to spam more messages than that. Use a smaller day number or boop less!");
+						break;
+					}
+					if(i == 0) {
+						messageAwooPing(mre, k + vring);
+					}
+					else {
+						messageAwooPing(mre, vring);
+					}
+					i++;
+					Thread.sleep(500 + (i * 100));
+				}
 			}
 			catch(Exception e) {
 				log.log(Level.SEVERE, "An exception was thrown", e);
