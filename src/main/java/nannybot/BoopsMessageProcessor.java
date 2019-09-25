@@ -49,7 +49,7 @@ public class BoopsMessageProcessor extends MessageProcessor {
 				String[] parts = Iterables.toArray(result, String.class);
 				int i = 0;
 				for(String vring : parts) {
-					if(i >= 7) {
+					if(i >= 5) {
 						messageAwooPing(mre, "OK, that's enough. I'm not going to spam more messages than that. Use a smaller day number or boop less!");
 						break;
 					}
