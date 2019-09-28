@@ -42,8 +42,13 @@ public class BoopInfosMessageProcessor extends MessageProcessor {
 						if(!m.matches()) continue;
 						String rhandle = m.group(1);
 						List<Boop> beeps = Main.m.getDb().getBoopsByName(rhandle);
-						if(beeps != null) for(Boop b : beeps) {
-							sb.append(b.toString()).append(",\n");
+						if(beeps != null && beeps.size() > 0) {
+							for(Boop b : beeps) {
+								sb.append(b.toString()).append(",\n");
+							}
+						}
+						else {
+							sb.append(rhandle).append(" has never been booped!\n");
 						}
 					}
 					messageAwooPingPaged(mre, "Requested boops: \n", sb.toString(), 5);
