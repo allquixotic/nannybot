@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Log @Singleton
 public class BoopMessageProcessor extends MessageProcessor {
 
-	private static final Pattern bmrx = Pattern.compile("^\\s*!boop\\s+(@)?(\\S+)\\s*(.*?)\\s*$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern bmrx = Pattern.compile("^\\s*!boop\\s+(?:@\\s*)?(\\S+)\\s*(.*?)\\s*$", Pattern.CASE_INSENSITIVE);
 
 	@Inject
 	private Sheet sheet;
@@ -33,9 +33,8 @@ public class BoopMessageProcessor extends MessageProcessor {
 			retval.error(false);
 
 			try {
-				boolean hasAt = Strings.isNullOrEmpty(matcher.group(1));
-				String handle = matcher.group(2);
-				String detail = matcher.group(3);
+				String handle = matcher.group(1);
+				String detail = matcher.group(2);
 				Boop beep = Boop.builder().when(new Date()).who(handle).detail(detail).by(mre.getAuthor().getName()).build();
 				Main.m.getDb().save(beep);
 				sheet.addBoop(beep);

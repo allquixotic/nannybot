@@ -44,24 +44,7 @@ public class BoopsMessageProcessor extends MessageProcessor {
 					sb.append(b.toString()).append(",\n");
 				}
 				String k = "Boops within the past " + numDays + " days: \n";
-				int maxl = 1900 - k.length();
-				Iterable<String> result = Splitter.fixedLength(maxl).split(sb);
-				String[] parts = Iterables.toArray(result, String.class);
-				int i = 0;
-				for(String vring : parts) {
-					if(i >= 5) {
-						messageAwooPing(mre, "OK, that's enough. I'm not going to spam more messages than that. Use a smaller day number or boop less!");
-						break;
-					}
-					if(i == 0) {
-						messageAwooPing(mre, k + vring);
-					}
-					else {
-						messageAwooPing(mre, vring);
-					}
-					i++;
-					Thread.sleep(500 + (i * 100));
-				}
+				messageAwooPingPaged(mre, k, sb.toString(), 5);
 			}
 			catch(Exception e) {
 				log.log(Level.SEVERE, "An exception was thrown", e);

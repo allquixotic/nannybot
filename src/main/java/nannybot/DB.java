@@ -1,19 +1,19 @@
 package nannybot;
 
-import io.jsondb.JsonDBTemplate;
-import lombok.extern.java.Log;
-import nannybot.model.Boop;
-
 import java.io.File;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
+import io.jsondb.JsonDBTemplate;
+import lombok.extern.java.Log;
+import nannybot.model.Boop;
 
 @Log
 public class DB {
@@ -46,7 +46,7 @@ public class DB {
 
     public List<Boop> getBoopsByName(String handle) {
         List<Boop> ugh = templ.find(String.format("/.", handle), Boop.class);
-        return ugh.parallelStream().filter(beep -> handle.equalsIgnoreCase(beep.getWho())).collect(Collectors.toList());
+        return ugh.parallelStream().filter(beep -> LevenshteinDistance.getDefaultInstance().apply(handle.toLowerCase(), beep.getWho().toLowerCase()) <= 1).collect(Collectors.toList());
     }
 
     public List<Boop> getBoopsWithinDays(int days) {

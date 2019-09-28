@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Log @Singleton
 public class BoopInfoMessageProcessor extends MessageProcessor {
 
-	private static final Pattern bmrx = Pattern.compile("^\\s*!boopinfo\\s+(@)?(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern bmrx = Pattern.compile("^\\s*!boopinfo\\s+(?:@\\s*)?(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
 
 	public BoopInfoMessageProcessor() {
 		rx = bmrx;
@@ -30,7 +30,7 @@ public class BoopInfoMessageProcessor extends MessageProcessor {
 			retval.error(false);
 
 			try {
-				String handle = matcher.group(2);
+				String handle = matcher.group(1);
 				List<Boop> boops = Main.m.getDb().getBoopsByName(handle);
 				StringBuilder sb = new StringBuilder();
 				for(Boop b : boops) {
